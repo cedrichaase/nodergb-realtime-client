@@ -4,6 +4,7 @@ from subprocess import Popen
 from flask import Flask
 from flask import jsonify
 from flask import Blueprint
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
@@ -73,7 +74,7 @@ def set_program(name):
     return jsonify(get_running_program()), 200
 
 
-@ctrl.route("/program", methods=['PUT'])
+@ctrl.route("/program/", methods=['PUT'])
 def stop_program():
     """
     Terminates the program that is currently running
@@ -99,6 +100,7 @@ def get_programs():
 
 app.register_blueprint(ctrl, url_prefix="/ctrl")
 app.register_blueprint(mgmt, url_prefix="/mgmt")
+CORS(app)
 
 if __name__ == "__main__":
     app.run()

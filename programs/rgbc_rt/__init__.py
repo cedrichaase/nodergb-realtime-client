@@ -11,7 +11,6 @@ class RGBCRt:
     @staticmethod
     def __format_color(color):
         hex_color = bytes(color.get_hex_l()[1:] + "\n", "utf8")
-        #print(hex_color)
         return hex_color
 
     def set_color(self, color):
@@ -21,5 +20,4 @@ class RGBCRt:
         self.socket.settimeout(timeout)
 
     def set_rgb(self, hex_color):
-        print(hex_color)
         self.socket.sendall(bytes(hex_color + "\n", "utf8"))

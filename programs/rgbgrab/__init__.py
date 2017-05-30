@@ -17,7 +17,7 @@ class Grabber:
     # prev_color = '#000000'
     rgb_prev = (0, 0, 0)
 
-    # maximum frequency
+    # current frequency
     freq = 120
 
     # minimum frequency
@@ -26,14 +26,8 @@ class Grabber:
     # max frequency
     freq_max = 60
 
-    # how quickly the frequency scaling scales down
-    scale_attack = 1
-
     # period
     period = 1 / freq
-
-    # times_scaled
-    times_scaled = 0
 
     def __init__(self, client):
         self.grabber = ColorGrabber()
@@ -46,16 +40,14 @@ class Grabber:
 
     def grab_color(self):
         rgb = self.grabber.grab()
-        hex_color = "{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
 
         if self.colors_differ(rgb, self.rgb_prev):
             self.rgb_prev = rgb
+            hex_color = "{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
             self.client.set_rgb(hex_color)
             self.set_freq(self.freq_max)
         else:
             self.set_freq(max(self.freq * 0.99, self.freq_min))
-
-        intfreq = int(self.freq)
 
     def run(self):
         while True:
@@ -65,7 +57,3 @@ class Grabber:
     def set_freq(self, freq):
         self.freq = freq
         self.period = 1/freq
-
-    def set_period(self, period):
-        self.period = period
-        self.freq = period
