@@ -120,7 +120,6 @@ def get_program(name):
         if name == __get_running_program():
             __stop_running_program()
 
-
         return jsonify({
             'content': program_content,
             'name': name

@@ -43,8 +43,8 @@ class Grabber:
 
         if self.colors_differ(rgb, self.rgb_prev):
             self.rgb_prev = rgb
-            hex_color = "{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
-            self.client.set_rgb(hex_color)
+            color = "{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
+            self.client.set_color(color)
             self.set_freq(self.freq_max)
         else:
             self.set_freq(max(self.freq * 0.99, self.freq_min))

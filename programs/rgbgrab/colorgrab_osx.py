@@ -1,5 +1,6 @@
 import struct
 import Quartz.CoreGraphics as CG
+from statistics import median
 
 
 class ColorGrabber:
@@ -43,17 +44,21 @@ class ColorGrabber:
         # and there are for (blue,green,red,alpha)
         data_format = "BBBB"
 
-        r_avg, b_avg, g_avg = 0, 0, 0
+        r_avg, b_avg, g_avg = 0, 0, 0;
+
+        r_values = list()
+        g_values = list()
+        b_values = list()
 
         for i in range(0, len(self._data), 4 * self.process_each):
             b, g, r, a = struct.unpack_from(data_format, self._data, offset=i)
-            r_avg += r
-            g_avg += g
-            b_avg += b
+            r_values.append(r)
+            g_values.append(g)
+            b_values.append(b)
 
-        r_avg = int(r_avg / num_colors / 2)
-        g_avg = int(g_avg / num_colors / 2)
-        b_avg = int(b_avg / num_colors / 2)
+        r_avg = int(median(r_values))
+        g_avg = int(median(g_values))
+        b_avg = int(median(b_values))
 
         #return "#{:02x}{:02x}{:02x}".format(r_avg, g_avg, b_avg)
         return r_avg, g_avg, b_avg

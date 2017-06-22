@@ -1,7 +1,7 @@
-from ctypes import windll
-dc = windll.user32.GetDC(0)
+# from ctypes import windll
+# dc = windll.user32.GetDC(0)
 
-from PIL import ImageGrab
+import pyscreenshot as ImageGrab
 
 class ColorGrabber:
     process_each = 256

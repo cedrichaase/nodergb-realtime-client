@@ -13,11 +13,14 @@ class RGBCRt:
         hex_color = bytes(color.get_hex_l()[1:] + "\n", "utf8")
         return hex_color
 
-    def set_color(self, color):
-        self.socket.sendall(self.__format_color(color))
+    @staticmethod
+    def __format_packet(color, host=''):
+        content = "{0}{1}{2}\n".format(host, ':' if host else '', color)
+        print(content)
+        return bytes(content, "utf8")
+
+    def set_color(self, color, host=''):
+        self.socket.sendall(self.__format_packet(color, host))
 
     def set_timeout(self, timeout):
         self.socket.settimeout(timeout)
-
-    def set_rgb(self, hex_color):
-        self.socket.sendall(bytes(hex_color + "\n", "utf8"))
