@@ -16,7 +16,6 @@ class RGBCRt:
     @staticmethod
     def __format_packet(color, host=''):
         content = "{0}{1}{2}\n".format(host, ':' if host else '', color)
-        print(content)
         return bytes(content, "utf8")
 
     def set_color(self, color, host=''):

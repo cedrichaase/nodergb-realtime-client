@@ -29,7 +29,7 @@ def __get_running_program():
 def __stop_running_program():
     global PROGRAM_PROCESS
     if PROGRAM_PROCESS:
-        PROGRAM_PROCESS.terminate()
+        PROGRAM_PROCESS.kill()
         PROGRAM_PROCESS = None
 
 
@@ -42,7 +42,7 @@ def __start_running_program(name):
 
     program = PROGRAM_PATH + name + '.py'
 
-    PROGRAM_PROCESS = Popen(['/usr/local/bin/python3', program])
+    PROGRAM_PROCESS = Popen(['/usr/bin/env', 'python3', program])
 
 
 @app.route("/")
@@ -127,22 +127,58 @@ def get_program(name):
 
 
 @mgmt.route("/program/<string:name>", methods=['PUT'])
-def save_program(name):
+def update_program(name):
     body = request.get_json()
+    program_path = __get_program_path(name)
+    new_program_path = program_path
+
+    if not os.path.isfile(program_path):
+        return jsonify("program not found"), 404
+
+    if 'name' in body and body["name"] != name:
+        new_name = body["name"]
+
+        new_program_path = __get_program_path(new_name)
+        if os.path.isfile(new_program_path):
+            return jsonify("program with that name exists already"), 400
+
+        os.rename(program_path, new_program_path)
+        os.remove(program_path)
+
+    with open(program_path, 'w') as program_file:
+        program_file.write(body["content"])
+
+        return jsonify({
+            'content': body["content"]
+        }), 200
+
+
+@mgmt.route("/program/<string:name>", methods=['POST'])
+def add_program(name):
+    body = request.get_json()
+    program_path = __get_program_path(name)
+
+    if os.path.isfile(program_path):
+        return jsonify("program with that name exists already"), 400
+
+    with open(program_path, 'w+') as program_file:
+        program_file.write(body["content"])
+
+        return jsonify({
+            'content': body["content"]
+        }), 201
+
+
+@mgmt.route("/program/<string:name>", methods=['DELETE'])
+def delete_program(name):
     program_path = __get_program_path(name)
 
     if not os.path.isfile(program_path):
         return jsonify("program not found"), 404
 
-    with open(program_path, 'w') as program_file:
-        program_file.write(body["content"])
+    os.remove(program_path)
 
-        __stop_running_program()
-        __start_running_program(name)
-
-        return jsonify({
-            'content': body["content"]
-        }), 200
+    return jsonify(), 204
 
 
 app.register_blueprint(ctrl, url_prefix="/ctrl")
@@ -150,4 +186,4 @@ app.register_blueprint(mgmt, url_prefix="/mgmt")
 CORS(app)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0', debug=True)

@@ -2,7 +2,7 @@ from colour import Color
 from rgbc_rt import RGBCRt
 from time import sleep
 
-client = RGBCRt('127.0.0.1', 1337)
+client = RGBCRt('raspberrypi', 1337)
 
 
 def set_color(color, host=''):

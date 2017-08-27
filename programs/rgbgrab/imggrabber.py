@@ -1,5 +1,6 @@
 from PIL import Image
 
+
 class ImageColorGrabber:
 
     def __init__(self):
@@ -11,9 +12,11 @@ class ImageColorGrabber:
 
         r_avg, b_avg, g_avg = 0, 0, 0
 
-        num_colors = len(pixels) / 256
+        process_each = 10
 
-        for i in range(0, len(pixels), 256):
+        num_colors = len(pixels) / process_each
+
+        for i in range(0, len(pixels), process_each):
             r_avg += pixels[i][0]
             g_avg += pixels[i][1]
             b_avg += pixels[i][2]
@@ -22,4 +25,4 @@ class ImageColorGrabber:
         g_avg = int(g_avg / num_colors)
         b_avg = int(b_avg / num_colors)
 
-        return "#{:02x}{:02x}{:02x}".format(r_avg, g_avg, b_avg)
+        return "{:02x}{:02x}{:02x}".format(r_avg, g_avg, b_avg)

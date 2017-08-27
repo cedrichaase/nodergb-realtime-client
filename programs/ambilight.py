@@ -2,6 +2,6 @@ from colour import Color
 from rgbc_rt import RGBCRt
 from rgbgrab import Grabber
 
-client = RGBCRt('127.0.0.1', 1337)
+client = RGBCRt('192.168.178.2', 1337)
 grabber = Grabber(client)
 grabber.run()
