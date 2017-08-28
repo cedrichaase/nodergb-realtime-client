@@ -20,11 +20,12 @@ PROGRAM_PATH = os.path.dirname(os.path.realpath(__file__)) + '/programs/'
 def __get_program_path(name):
     return PROGRAM_PATH + name + '.py'
 
+
 def __get_running_program():
     """
     :return: The name of the program that is currently running 
     """
-    return PROGRAM_PROCESS.args[1].split('/')[-1][:-3] if PROGRAM_PROCESS else ""
+    return PROGRAM_PROCESS.args[2].split('/')[-1][:-3] if PROGRAM_PROCESS else ""
 
 
 def __stop_running_program():
