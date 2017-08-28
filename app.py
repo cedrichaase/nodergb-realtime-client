@@ -14,7 +14,8 @@ mgmt = Blueprint("mgmt", __name__)
 
 
 PROGRAM_PROCESS = None
-PROGRAM_PATH = os.getcwd() + '/programs/'
+PROGRAM_PATH = os.path.dirname(os.path.realpath(__file__)) + '/programs/'
+
 
 def __get_program_path(name):
     return PROGRAM_PATH + name + '.py'
