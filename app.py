@@ -1,3 +1,4 @@
+import datetime
 import os
 from subprocess import Popen
 
@@ -5,7 +6,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import Blueprint
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -14,7 +15,9 @@ mgmt = Blueprint("mgmt", __name__)
 
 
 PROGRAM_PROCESS = None
-PROGRAM_PATH = os.path.dirname(os.path.realpath(__file__)) + '/programs/'
+THIS_FILEPATH = os.path.dirname(os.path.realpath(__file__))
+PROGRAM_PATH = THIS_FILEPATH + '/programs/'
+ARCHIVE_PATH = PROGRAM_PATH + 'archive/'
 
 
 def __get_program_path(name):
@@ -119,9 +122,6 @@ def get_program(name):
     with open(program_path, 'r') as program_file:
         program_content = program_file.read()
 
-        if name == __get_running_program():
-            __stop_running_program()
-
         return jsonify({
             'content': program_content,
             'name': name
@@ -137,6 +137,10 @@ def update_program(name):
     if not os.path.isfile(program_path):
         return jsonify("program not found"), 404
 
+    if "content" in body:
+        with open(program_path, 'w') as program_file:
+            program_file.write(body["content"])
+
     if 'name' in body and body["name"] != name:
         new_name = body["name"]
 
@@ -145,14 +149,8 @@ def update_program(name):
             return jsonify("program with that name exists already"), 400
 
         os.rename(program_path, new_program_path)
-        os.remove(program_path)
 
-    with open(program_path, 'w') as program_file:
-        program_file.write(body["content"])
-
-        return jsonify({
-            'content': body["content"]
-        }), 200
+    return jsonify(body), 200
 
 
 @mgmt.route("/program/<string:name>", methods=['POST'])
@@ -173,12 +171,19 @@ def add_program(name):
 
 @mgmt.route("/program/<string:name>", methods=['DELETE'])
 def delete_program(name):
+    global ARCHIVE_PATH
+
     program_path = __get_program_path(name)
 
     if not os.path.isfile(program_path):
         return jsonify("program not found"), 404
 
-    os.remove(program_path)
+    prefix = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    suffix = program_path.split('/')[-1]
+
+    archive_filepath = "{}/{}_{}".format(ARCHIVE_PATH, prefix, suffix)
+
+    os.rename(program_path, archive_filepath)
 
     return jsonify(), 204
 
@@ -188,4 +193,4 @@ app.register_blueprint(mgmt, url_prefix="/mgmt")
 CORS(app)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
