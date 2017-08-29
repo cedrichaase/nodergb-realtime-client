@@ -154,19 +154,25 @@ def update_program(name):
 
 
 @mgmt.route("/program/<string:name>", methods=['POST'])
-def add_program(name):
+def create_program(name):
     body = request.get_json()
     program_path = __get_program_path(name)
 
     if os.path.isfile(program_path):
         return jsonify("program with that name exists already"), 400
 
+    if body is None:
+        body = dict()
+
     with open(program_path, 'w+') as program_file:
+        if not body or "content" not in body:
+            body["content"] = "from rgb import *\n\n"
+
         program_file.write(body["content"])
 
-        return jsonify({
-            'content': body["content"]
-        }), 201
+    body["name"] = name
+
+    return jsonify(body), 201
 
 
 @mgmt.route("/program/<string:name>", methods=['DELETE'])
@@ -178,10 +184,13 @@ def delete_program(name):
     if not os.path.isfile(program_path):
         return jsonify("program not found"), 404
 
-    prefix = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    suffix = program_path.split('/')[-1]
+    program_name = program_path.split('/')[-1]
+    file_ending = program_name.split('.')[-1]
+    file_name = '.'.join(program_name.split('.')[:-1])
 
-    archive_filepath = "{}/{}_{}".format(ARCHIVE_PATH, prefix, suffix)
+    suffix = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+
+    archive_filepath = "{}/{}_{}.{}".format(ARCHIVE_PATH, file_name, suffix, file_ending)
 
     os.rename(program_path, archive_filepath)
 

@@ -1,3 +1,4 @@
 *.pyc
 .idea
 programs/*.py
+programs/archive/*.py
